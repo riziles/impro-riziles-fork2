@@ -1,7 +1,7 @@
 import { html } from "/js/lib/lit-html.js";
 import { classnames } from "/js/utils.js";
 
-// Speech bubble with magnifying glass inside
+/** Sidebar icon: speech bubble with magnifying glass inside. */
 export function chatSearchIconTemplate({ filled = false } = ({} = {})) {
   return html`<div class=${classnames("icon chat-search-icon", { filled })}>
     ${filled

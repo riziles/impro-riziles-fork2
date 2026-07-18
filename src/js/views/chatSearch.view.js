@@ -8,6 +8,7 @@ import MiniSearch from "/js/lib/minisearch.js";
 
 // ── Helpers ──
 
+/** Build a display label for a conversation (group name or member names). */
 function convoLabel(convo, currentDid) {
   const group = getGroupConvoDetails(convo);
   if (group?.name) return group.name;
@@ -19,6 +20,7 @@ function convoLabel(convo, currentDid) {
   );
 }
 
+/** Extract a short text preview from a message. */
 function msgText(m) {
   const t =
     m.$type === "chat.bsky.convo.defs#messageView"
@@ -29,6 +31,7 @@ function msgText(m) {
   return (t || "").substring(0, 300);
 }
 
+/** Resolve a sender DID to a display name, falling back to the DID. */
 function senderLabel(did, convo, dataLayer) {
   const m = (convo?.members ?? []).find((x) => x.did === did);
   if (m) return getDisplayName(m) || m.handle || did;
@@ -37,12 +40,14 @@ function senderLabel(did, convo, dataLayer) {
   return did;
 }
 
+/** Strip supplementary-plane Unicode that confuses lit-html. */
 function safe(s) {
   return (s || "").replace(/[\u{10000}-\u{10FFFF}]/gu, "").trim();
 }
 
 // ── View ──
 
+/** Full-page chat message search with MiniSearch indexing and inline reply. */
 class ChatSearchView extends View {
   async render({ root, layout, router, context: { dataLayer } }) {
     // State
@@ -69,6 +74,7 @@ class ChatSearchView extends View {
 
     // ── Data loading ──
 
+    /** Fetch the user's conversation list from the data layer. */
     async function loadConvos() {
       await dataLayer.declarative.ensureCurrentUser();
       await dataLayer.requests.loadConvoList({ reload: true, limit: 100 });
@@ -76,6 +82,7 @@ class ChatSearchView extends View {
       state.$convos.set(list ?? []);
     }
 
+    /** Pull and index messages for the selected conversation and time range. */
     async function pullMessages() {
       const convoId = state.$selectedConvoId.get();
       if (!convoId || state.$pulling.get()) return;
@@ -188,6 +195,7 @@ class ChatSearchView extends View {
 
     // ── Send reply ──
 
+    /** Send a reply to a given message via the Bluesky chat API. */
     async function sendReply(messageId) {
       const text = state.$replyText.get().trim();
       if (!text || state.$replySending.get()) return;
@@ -212,6 +220,7 @@ class ChatSearchView extends View {
 
     // ── Search ──
 
+    /** Run search + filters on the current index and query. */
     function getResults() {
       const data = state.$messages.get();
       const q = state.$query.get().trim();
@@ -235,6 +244,7 @@ class ChatSearchView extends View {
 
     // ── Render ──
 
+    /** Collect unique sender DIDs/names from loaded messages. */
     function senderOptions(convo) {
       const data = state.$messages.get();
       if (!data) return [];
