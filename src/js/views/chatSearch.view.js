@@ -293,7 +293,7 @@ class ChatSearchView extends View {
                     ?disabled=${!selectedId || pulling}
                     @click=${pullMessages}
                   >
-                    ${pulling ? "Pulling…" : "Pull"}
+                    ${pulling ? "Building…" : "Build cache"}
                   </button>
                 </div>
                 ${pullError
@@ -301,7 +301,7 @@ class ChatSearchView extends View {
                   : ""}
                 ${pulling
                   ? html`<p class="chat-search-status">
-                      Pulled ${pullFetched} messages…
+                      Indexed ${pullFetched} messages…
                     </p>`
                   : pullTotal !== null
                     ? html`<p class="chat-search-status">
@@ -387,7 +387,8 @@ class ChatSearchView extends View {
                   `
                 : !pulling && pullTotal === null
                   ? html`<p class="chat-search-empty">
-                      Select a conversation and click Pull to load messages.
+                      Select a conversation and click Build cache to load
+                      messages.
                     </p>`
                   : ""}
             </div>
