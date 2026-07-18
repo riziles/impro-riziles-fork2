@@ -44,7 +44,7 @@ function safe(s) {
 // ── View ──
 
 class ChatSearchView extends View {
-  async render({ root, layout, context: { dataLayer } }) {
+  async render({ root, layout, router, context: { dataLayer } }) {
     // State
     const state = {
       $convos: new Signal.State(null),
@@ -377,6 +377,15 @@ class ChatSearchView extends View {
                                   ${safe(r.text)}
                                 </div>
                                 <div class="chat-search-result-time">
+                                  <button
+                                    class="chat-search-reply-btn"
+                                    @click=${() =>
+                                      router.go(
+                                        `/messages/${data.convoId}?anchor=${encodeURIComponent(r.id)}`,
+                                      )}
+                                  >
+                                    Reply
+                                  </button>
                                   ${new Date(r.sentAt).toLocaleString()}
                                 </div>
                               </div>`,

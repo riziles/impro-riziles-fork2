@@ -1599,6 +1599,29 @@ class ChatDetailView extends View {
       });
       await dataLayer.declarative.ensureConvo(convoId);
       await loadMessages({ reload: true });
+
+      // Support deep-linking to a specific message via ?anchor=messageId
+      const anchorId = new URLSearchParams(window.location.search).get(
+        "anchor",
+      );
+      if (anchorId) {
+        // Wait for the message to be rendered
+        const check = () => {
+          const el = root.querySelector(
+            `.message-wrapper[data-message-id="${CSS.escape(anchorId)}"]`,
+          );
+          if (el) {
+            scrollToAndHighlightMessage(anchorId);
+            // Clean URL
+            const url = new URL(window.location);
+            url.searchParams.delete("anchor");
+            window.history.replaceState({}, "", url);
+          } else {
+            setTimeout(check, 200);
+          }
+        };
+        setTimeout(check, 100);
+      }
     });
 
     root.addEventListener("page-restore", async (e) => {

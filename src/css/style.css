@@ -10693,4 +10693,22 @@ p.setting-item-desc {
   margin-top: 6px;
   color: var(--text-muted);
   font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chat-search-reply-btn {
+  padding: 2px 8px;
+  border: 1px solid var(--post-border-color);
+  border-radius: 4px;
+  background: var(--background-color);
+  color: var(--highlight-color);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.chat-search-reply-btn:hover {
+  background: var(--highlight-color);
+  color: white;
 }
