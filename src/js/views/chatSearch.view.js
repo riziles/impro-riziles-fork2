@@ -161,7 +161,7 @@ class ChatSearchView extends View {
         // Build MiniSearch index
         const index = new MiniSearch({
           fields: ["text", "sender"],
-          storeFields: ["id", "senderDid", "text", "sentAt"],
+          storeFields: ["id", "senderDid", "sender", "text", "sentAt"],
           searchOptions: { fuzzy: 0.2, prefix: true },
         });
         index.addAll(
