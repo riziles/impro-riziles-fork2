@@ -10568,6 +10568,11 @@ p.setting-item-desc {
   gap: 8px;
   align-items: center;
   flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.chat-search-row:last-child {
+  margin-bottom: 0;
 }
 
 .chat-search-select {
