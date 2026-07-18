@@ -369,8 +369,7 @@ class ChatSearchView extends View {
                                 <div class="chat-search-result-header">
                                   <span class="chat-search-result-sender"
                                     >${safe(r.sender)}</span
-                                  >
-                                  <span class="chat-search-result-match"
+                                  ><span class="chat-search-result-match"
                                     >score ${r.score.toFixed(1)}</span
                                   >
                                 </div>
