@@ -364,8 +364,8 @@ class ChatSearchView extends View {
                             No matching messages.
                           </p>`
                         : results.map(
-                            (r) => html`
-                              <div class="chat-search-result">
+                            (r) =>
+                              html`<div class="chat-search-result">
                                 <div class="chat-search-result-header">
                                   <span class="chat-search-result-sender"
                                     >${safe(r.sender)}</span
@@ -380,8 +380,7 @@ class ChatSearchView extends View {
                                 <div class="chat-search-result-time">
                                   ${new Date(r.sentAt).toLocaleString()}
                                 </div>
-                              </div>
-                            `,
+                              </div>`,
                           )}
                     </section>
                   `
