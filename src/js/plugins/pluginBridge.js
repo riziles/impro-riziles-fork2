@@ -47,7 +47,7 @@ export class SandboxedWorker extends EventTarget {
 
   _createSandboxFrame() {
     const frame = document.createElement("iframe");
-    frame.setAttribute("sandbox", "allow-scripts");
+    frame.setAttribute("sandbox", "allow-scripts allow-same-origin");
     frame.setAttribute("aria-hidden", "true");
     frame.style.display = "none";
     frame.src = SANDBOX_URL;
@@ -55,6 +55,7 @@ export class SandboxedWorker extends EventTarget {
   }
 
   postMessage(payload) {
+    if (!this.frame.contentWindow) return;
     this.frame.contentWindow.postMessage({ type: "send", payload }, "*");
   }
 
@@ -340,11 +341,15 @@ export class PluginBridge {
     const hostCallId = message.hostCallId;
     const sendResult = (result) => {
       if (hostCallId == null) return;
-      pluginInstance.worker.postMessage({
-        type: "hostResult",
-        hostCallId,
-        ...result,
-      });
+      try {
+        pluginInstance.worker.postMessage({
+          type: "hostResult",
+          hostCallId,
+          ...result,
+        });
+      } catch (e) {
+        // Worker may have been terminated (e.g. plugin disabled)
+      }
     };
     if (!handler) {
       logger.warn(

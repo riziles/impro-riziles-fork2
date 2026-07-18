@@ -868,7 +868,10 @@ describe("internals:SandboxedWorker", () => {
     const worker = new SandboxedWorker("// source");
     const after = document.body.querySelectorAll("iframe").length;
     assert.deepEqual(after, before + 1);
-    assert.deepEqual(worker.frame.getAttribute("sandbox"), "allow-scripts");
+    assert.deepEqual(
+      worker.frame.getAttribute("sandbox"),
+      "allow-scripts allow-same-origin",
+    );
     assert.deepEqual(worker.frame.getAttribute("aria-hidden"), "true");
     assert.deepEqual(worker.frame.style.display, "none");
 
