@@ -111,6 +111,14 @@ class ChatSearchView extends View {
           if (!cursor) break;
         }
 
+        // Deduplicate before indexing (pagination can overlap)
+        const seen = new Set();
+        const unique = all.filter((m) => {
+          if (seen.has(m.id)) return false;
+          seen.add(m.id);
+          return true;
+        });
+
         // Build MiniSearch index
         const index = new MiniSearch({
           fields: ["text", "sender"],
@@ -118,7 +126,7 @@ class ChatSearchView extends View {
           searchOptions: { fuzzy: 0.2, prefix: true },
         });
         index.addAll(
-          all.map((m) => ({
+          unique.map((m) => ({
             id: m.id,
             senderDid: m.sender?.did ?? "",
             sender: safe(
@@ -132,8 +140,8 @@ class ChatSearchView extends View {
           })),
         );
 
-        state.$messages.set({ convoId, messages: all, index });
-        state.$pullTotal.set(all.length);
+        state.$messages.set({ convoId, messages: unique, index });
+        state.$pullTotal.set(unique.length);
       } catch (err) {
         state.$pullError.set(err.message || String(err));
       } finally {
