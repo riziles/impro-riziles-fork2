@@ -10546,3 +10546,140 @@ p.setting-item-desc {
     text-decoration: underline;
   }
 }
+
+/* ── Chat Search ── */
+
+#chat-search-view main {
+  padding: 0;
+}
+
+.chat-search-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.chat-search-section {
+  margin-bottom: 20px;
+}
+
+.chat-search-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.chat-search-select {
+  padding: 6px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-size: 14px;
+}
+
+.chat-search-select-full {
+  flex: 1;
+  min-width: 140px;
+}
+
+.chat-search-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-size: 14px;
+}
+
+.chat-search-input:focus {
+  outline: none;
+  border-color: var(--highlight-color);
+}
+
+.chat-search-error {
+  color: var(--danger-color, #e74c3c);
+  font-size: 13px;
+  margin: 8px 0 0;
+}
+
+.chat-search-status {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 8px 0 0;
+}
+
+.chat-search-count {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 8px 0 0;
+}
+
+.chat-search-time-btn {
+  padding: 4px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.chat-search-time-btn.active {
+  background: var(--highlight-color);
+  color: white;
+  border-color: var(--highlight-color);
+}
+
+.chat-search-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 32px 16px;
+  font-size: 14px;
+}
+
+.chat-search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chat-search-result {
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-color);
+}
+
+.chat-search-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.chat-search-result-sender {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.chat-search-result-match {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.chat-search-result-text {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--text-color);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.chat-search-result-time {
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+}

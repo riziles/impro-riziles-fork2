@@ -202,6 +202,12 @@ export function sidebarTemplate({
       url: "/feeds",
     },
     {
+      id: "chat-search",
+      icon: searchIconTemplate,
+      label: "Chat Search",
+      url: "/chat-search",
+    },
+    {
       id: "bookmarks",
       icon: bookmarkIconTemplate,
       label: "Saved",
