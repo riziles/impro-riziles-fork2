@@ -114,7 +114,6 @@ class ChatSearchView extends View {
         let cursor = null;
         let done = false;
         let pages = 0;
-        let stalePages = 0;
 
         while (!done && pages < 100) {
           await dataLayer.requests.loadConvoMessages(convoId, {
@@ -125,7 +124,6 @@ class ChatSearchView extends View {
           if (!data) break;
 
           const msgs = data.messages ?? [];
-          let foundNew = false;
           for (const m of msgs) {
             // Skip if we already have this message
             if (existingIds.has(m.id)) continue;
@@ -139,16 +137,6 @@ class ChatSearchView extends View {
             }
             all.push(m);
             existingIds.add(m.id);
-            foundNew = true;
-          }
-          // If we saw nothing new AND hit the since cutoff, we're done
-          // Otherwise keep going (we may be seeking older messages)
-          if (!foundNew) {
-            stalePages++;
-            // Stop if 3 consecutive pages had nothing new OR we hit the since cutoff
-            if (stalePages >= 3) done = true;
-          } else {
-            stalePages = 0;
           }
           state.$pullFetched.set(all.length);
           pages++;
