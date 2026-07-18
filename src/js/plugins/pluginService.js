@@ -384,6 +384,66 @@ export class PluginService extends ReactiveStore {
         handle: this.session.handle,
       };
     });
+
+    this.pluginBridge.addHostMethod("getConvoList", async (plugin) => {
+      if (!this.session || !this._dataLayer) return [];
+      await this._dataLayer.declarative.ensureCurrentUser();
+      await this._dataLayer.requests.loadConvoList({ reload: true, limit: 30 });
+      const list = this._dataLayer.derived.$convoList.get();
+      const currentDid = this.session.did;
+      return (list ?? []).map((c) => {
+        const members = (c.members || []).map((m) => ({
+          did: m.did,
+          handle: m.handle,
+          displayName: m.displayName,
+        }));
+        const groupName =
+          c.kind?.$type === "chat.bsky.convo.defs#groupConvo"
+            ? c.kind.name
+            : null;
+        const name = groupName || c.name;
+        const label =
+          name ||
+          members
+            .filter((m) => m.did !== currentDid)
+            .map((m) => m.displayName || m.handle)
+            .join(", ") ||
+          c.id;
+        return { id: c.id, name, label, members, currentDid };
+      });
+    });
+
+    this.pluginBridge.addHostMethod(
+      "getConvoMessages",
+      async (plugin, { convoId, cursor, since }) => {
+        if (!this.session || !this._dataLayer) {
+          return { messages: [], cursor: null, done: true };
+        }
+        const reload = !cursor;
+        await this._dataLayer.requests.loadConvoMessages(convoId, {
+          reload,
+          limit: 100,
+        });
+        const data = this._dataLayer.derived.$convoMessages.get(convoId);
+        if (!data) return { messages: [], cursor: null, done: true };
+        // Filter messages older than cutoff (sentAt is ISO string)
+        let msgs = data.messages ?? [];
+        let done = false;
+        if (since) {
+          const cutoff = new Date(since).getTime();
+          msgs = msgs.filter((m) => new Date(m.sentAt).getTime() >= cutoff);
+          // If we got fewer messages than the full page, or the earliest is before cutoff, we're done
+          if (msgs.length < (data.messages?.length ?? 0)) {
+            done = true;
+          }
+        }
+        return {
+          messages: msgs,
+          cursor: done ? null : (data.cursor ?? null),
+          done,
+        };
+      },
+    );
   }
 
   async loadEnabledPlugins() {
