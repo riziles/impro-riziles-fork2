@@ -86,10 +86,35 @@ class ChatSearchView extends View {
           days > 0
             ? new Date(Date.now() - days * 86400000).toISOString()
             : null;
-        const all = [];
+
+        // Track existing message IDs to avoid re-fetching
+        const existing = state.$messages.get();
+        const existingIds = new Set();
+        let oldestExisting = null;
+        if (existing && existing.convoId === convoId) {
+          for (const m of existing.messages) {
+            existingIds.add(m.id);
+            const t = new Date(m.sentAt).getTime();
+            if (oldestExisting === null || t < oldestExisting)
+              oldestExisting = t;
+          }
+          // If time range covers only what we already have, skip entirely
+          if (since) {
+            const cutoff = new Date(since).getTime();
+            if (oldestExisting !== null && oldestExisting >= cutoff) {
+              state.$pulling.set(false);
+              state.$pullFetched.set(existing.messages.length);
+              state.$pullTotal.set(existing.messages.length);
+              return;
+            }
+          }
+        }
+
+        const all = existing ? [...existing.messages] : [];
         let cursor = null;
         let done = false;
         let pages = 0;
+        let seenNew = false;
 
         while (!done && pages < 100) {
           await dataLayer.requests.loadConvoMessages(convoId, {
@@ -99,28 +124,39 @@ class ChatSearchView extends View {
           const data = dataLayer.derived.$convoMessages.get(convoId);
           if (!data) break;
 
-          let msgs = data.messages ?? [];
-          if (since) {
-            const cutoff = new Date(since).getTime();
-            msgs = msgs.filter((m) => new Date(m.sentAt).getTime() >= cutoff);
-            if (msgs.length < (data.messages?.length ?? 0)) done = true;
+          const msgs = data.messages ?? [];
+          for (const m of msgs) {
+            // Skip if we already have this message
+            if (existingIds.has(m.id)) {
+              if (seenNew) done = true;
+              continue;
+            }
+            // Filter by time range
+            if (
+              since &&
+              new Date(m.sentAt).getTime() < new Date(since).getTime()
+            ) {
+              done = true;
+              continue;
+            }
+            all.push(m);
+            existingIds.add(m.id);
+            seenNew = true;
           }
-          all.push(...msgs);
           state.$pullFetched.set(all.length);
           pages++;
 
+          // If we hit a page with no new messages, assume we're past the new stuff
+          if (!seenNew && pages >= 2) done = true;
           if (done) break;
           cursor = data.cursor;
           if (!cursor) break;
         }
 
-        // Deduplicate before indexing (pagination can overlap)
-        const seen = new Set();
-        const unique = all.filter((m) => {
-          if (seen.has(m.id)) return false;
-          seen.add(m.id);
-          return true;
-        });
+        // Sort by time ascending for consistent display
+        all.sort(
+          (a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime(),
+        );
 
         // Build MiniSearch index
         const index = new MiniSearch({
@@ -129,7 +165,7 @@ class ChatSearchView extends View {
           searchOptions: { fuzzy: 0.2, prefix: true },
         });
         index.addAll(
-          unique.map((m) => ({
+          all.map((m) => ({
             id: m.id,
             senderDid: m.sender?.did ?? "",
             sender: safe(
@@ -144,8 +180,8 @@ class ChatSearchView extends View {
           })),
         );
 
-        state.$messages.set({ convoId, messages: unique, index });
-        state.$pullTotal.set(unique.length);
+        state.$messages.set({ convoId, messages: all, index });
+        state.$pullTotal.set(all.length);
       } catch (err) {
         state.$pullError.set(err.message || String(err));
       } finally {
