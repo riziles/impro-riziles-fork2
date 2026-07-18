@@ -57,7 +57,11 @@ class ChatSearchView extends View {
       $query: new Signal.State(""),
       $senderFilter: new Signal.State(""),
       $timeFilter: new Signal.State("all"),
-      $messages: new Signal.State(null), // { convoId, messages[], index }
+      $messages: new Signal.State(null),
+      $replyOpen: new Signal.State(null), // messageId of reply being composed, or null
+      $replyText: new Signal.State(""),
+      $replySending: new Signal.State(false),
+      $replyStatus: new Signal.State(""),
     };
 
     const currentUser = dataLayer.derived.$currentUser.get();
@@ -179,6 +183,30 @@ class ChatSearchView extends View {
         state.$pullError.set(err.message || String(err));
       } finally {
         state.$pulling.set(false);
+      }
+    }
+
+    // ── Send reply ──
+
+    async function sendReply(messageId) {
+      const text = state.$replyText.get().trim();
+      if (!text || state.$replySending.get()) return;
+      state.$replySending.set(true);
+      state.$replyStatus.set("");
+      try {
+        const convoId = state.$messages.get()?.convoId;
+        await dataLayer.mutations.createMessage(convoId, {
+          text,
+          replyTo: { messageId },
+        });
+        state.$replyStatus.set("Sent!");
+        state.$replyText.set("");
+        state.$replyOpen.set(null);
+        setTimeout(() => state.$replyStatus.set(""), 3000);
+      } catch (err) {
+        state.$replyStatus.set(err.message || "Failed");
+      } finally {
+        state.$replySending.set(false);
       }
     }
 
@@ -356,33 +384,62 @@ class ChatSearchView extends View {
                         ? html`<p class="chat-search-empty">
                             No matching messages.
                           </p>`
-                        : results.map(
-                            (r) =>
-                              html`<div class="chat-search-result">
-                                <div class="chat-search-result-header">
-                                  <span class="chat-search-result-sender"
-                                    >${safe(r.sender)}</span
-                                  ><span class="chat-search-result-match"
-                                    >score ${r.score.toFixed(1)}</span
-                                  >
-                                </div>
-                                <div class="chat-search-result-text">
-                                  ${safe(r.text)}
-                                </div>
-                                <div class="chat-search-result-time">
-                                  <button
-                                    class="chat-search-reply-btn"
-                                    @click=${() =>
-                                      router.go(
-                                        `/messages/${data.convoId}?anchor=${encodeURIComponent(r.id)}`,
-                                      )}
-                                  >
-                                    Reply
-                                  </button>
-                                  ${new Date(r.sentAt).toLocaleString()}
-                                </div>
-                              </div>`,
-                          )}
+                        : results.map((r) => {
+                            const replyOpen = state.$replyOpen.get();
+                            const replyText = state.$replyText.get();
+                            const replySending = state.$replySending.get();
+                            const replyStatus = state.$replyStatus.get();
+                            const isOpen = replyOpen === r.id;
+                            return html`<div class="chat-search-result">
+                              <div class="chat-search-result-header">
+                                <span class="chat-search-result-sender"
+                                  >${safe(r.sender)}</span
+                                ><span class="chat-search-result-match"
+                                  >score ${r.score.toFixed(1)}</span
+                                >
+                              </div>
+                              <div class="chat-search-result-text">
+                                ${safe(r.text)}
+                              </div>
+                              <div class="chat-search-result-time">
+                                <button
+                                  class="chat-search-reply-btn"
+                                  @click=${() => {
+                                    state.$replyOpen.set(isOpen ? null : r.id);
+                                    state.$replyText.set("");
+                                    state.$replyStatus.set("");
+                                  }}
+                                >
+                                  ${isOpen ? "Cancel" : "Reply"}
+                                </button>
+                                ${new Date(r.sentAt).toLocaleString()}
+                              </div>
+                              ${isOpen
+                                ? html`<div class="chat-search-reply-area">
+                                    <textarea
+                                      class="chat-search-reply-input"
+                                      rows="2"
+                                      placeholder="Write a reply…"
+                                      .value=${replyText}
+                                      @input=${(e) =>
+                                        state.$replyText.set(e.target.value)}
+                                    ></textarea>
+                                    <div class="chat-search-reply-actions">
+                                      <span class="chat-search-reply-status"
+                                        >${replyStatus}</span
+                                      ><button
+                                        class="rounded-button rounded-button-primary chat-search-send-btn"
+                                        ?disabled=${replySending ||
+                                        !replyText.trim()}
+                                        @click=${() => sendReply(r.id)}
+                                      >
+                                        ${replySending ? "Sending…" : "Send"}
+                                      </button>
+                                    </div>
+                                  </div>`
+                                : ""}
+                            </div>`;
+                          })}
                     </section>
                   `
                 : !pulling && pullTotal === null

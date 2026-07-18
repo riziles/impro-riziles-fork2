@@ -10712,3 +10712,45 @@ p.setting-item-desc {
   background: var(--highlight-color);
   color: white;
 }
+
+.chat-search-reply-area {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--post-border-color);
+}
+
+.chat-search-reply-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--post-border-color);
+  border-radius: 6px;
+  background: var(--background-color);
+  color: var(--text-color);
+  font-size: 13px;
+  font-family: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.chat-search-reply-input:focus {
+  outline: none;
+  border-color: var(--highlight-color);
+}
+
+.chat-search-reply-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.chat-search-reply-status {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.chat-search-send-btn {
+  font-size: 12px;
+  padding: 4px 14px;
+}
