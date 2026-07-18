@@ -29,9 +29,12 @@ function msgText(m) {
   return (t || "").substring(0, 300);
 }
 
-function senderLabel(did, convo) {
+function senderLabel(did, convo, dataLayer) {
   const m = (convo?.members ?? []).find((x) => x.did === did);
-  return m ? getDisplayName(m) || m.handle || did : did;
+  if (m) return getDisplayName(m) || m.handle || did;
+  const profile = dataLayer?.derived?.$hydratedProfiles?.get(did);
+  if (profile) return getDisplayName(profile) || profile.handle || did;
+  return did;
 }
 
 function safe(s) {
@@ -133,6 +136,7 @@ class ChatSearchView extends View {
               senderLabel(
                 m.sender?.did,
                 state.$convos.get()?.find((c) => c.id === convoId),
+                dataLayer,
               ),
             ),
             text: safe(msgText(m)),
@@ -180,7 +184,8 @@ class ChatSearchView extends View {
       const senders = new Map();
       for (const m of data.messages) {
         const did = m.sender?.did;
-        if (did && !senders.has(did)) senders.set(did, senderLabel(did, convo));
+        if (did && !senders.has(did))
+          senders.set(did, senderLabel(did, convo, dataLayer));
       }
       return [...senders.entries()].map(([did, label]) => ({ did, label }));
     }
