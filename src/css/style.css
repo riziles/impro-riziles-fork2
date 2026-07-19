@@ -10575,6 +10575,7 @@ p.setting-item-desc {
   margin-bottom: 0;
 }
 
+/* TODO: replace with existing .select-wrapper pattern for consistent dropdown styling */
 .chat-search-select {
   padding: 6px 10px;
   border: 1px solid var(--post-border-color);
