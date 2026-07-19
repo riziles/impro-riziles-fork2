@@ -1,3 +1,8 @@
+/**
+ * Vendored from MiniSearch 7.2.0 (https://github.com/lucaong/minisearch)
+ * Verbatim copy of node_modules/minisearch/dist/es/index.js
+ * @see https://www.npmjs.com/package/minisearch
+ */
 /** @ignore */
 const ENTRIES = 'ENTRIES';
 /** @ignore */
