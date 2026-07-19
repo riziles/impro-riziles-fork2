@@ -10546,3 +10546,212 @@ p.setting-item-desc {
     text-decoration: underline;
   }
 }
+
+/* ── Chat Search ── */
+
+#chat-search-view main {
+  padding: 0;
+}
+
+.chat-search-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.chat-search-section {
+  margin-bottom: 20px;
+}
+
+.chat-search-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.chat-search-row:last-child {
+  margin-bottom: 0;
+}
+
+/* TODO: replace with existing .select-wrapper pattern for consistent dropdown styling */
+.chat-search-select {
+  padding: 6px 10px;
+  border: 1px solid var(--post-border-color);
+  border-radius: 6px;
+  background: var(--background-color);
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+#chat-search-view .chat-search-select option {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.chat-search-select-full {
+  flex: 1;
+  min-width: 140px;
+}
+
+.chat-search-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--post-border-color);
+  border-radius: 6px;
+  background: var(--background-color);
+  color: var(--text-color);
+  font-size: 14px;
+}
+
+.chat-search-input:focus {
+  outline: none;
+  border-color: var(--highlight-color);
+}
+
+.chat-search-error {
+  color: var(--danger-color, #e74c3c);
+  font-size: 13px;
+  margin: 8px 0 0;
+}
+
+.chat-search-status {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 8px 0 0;
+}
+
+.chat-search-count {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 8px 0 0;
+}
+
+.chat-search-time-btn {
+  padding: 4px 10px;
+  border: 1px solid var(--post-border-color);
+  border-radius: 6px;
+  background: var(--background-color);
+  color: var(--text-color);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.chat-search-time-btn.active {
+  background: var(--highlight-color);
+  color: white;
+  border-color: var(--highlight-color);
+}
+
+.chat-search-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 32px 16px;
+  font-size: 14px;
+}
+
+.chat-search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chat-search-result {
+  padding: 12px;
+  border: 1px solid var(--post-border-color);
+  border-radius: 8px;
+  background: var(--background-color);
+}
+
+.chat-search-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.chat-search-result-sender {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.chat-search-result-match {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.chat-search-result-text {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--text-color);
+  word-break: break-word;
+}
+
+.chat-search-result-time {
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chat-search-reply-btn {
+  padding: 2px 8px;
+  border: 1px solid var(--post-border-color);
+  border-radius: 4px;
+  background: var(--background-color);
+  color: var(--highlight-color);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.chat-search-reply-btn:hover {
+  background: var(--highlight-color);
+  color: white;
+}
+
+.chat-search-reply-area {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--post-border-color);
+}
+
+.chat-search-reply-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--post-border-color);
+  border-radius: 6px;
+  background: var(--background-color);
+  color: var(--text-color);
+  font-size: 13px;
+  font-family: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.chat-search-reply-input:focus {
+  outline: none;
+  border-color: var(--highlight-color);
+}
+
+.chat-search-reply-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.chat-search-reply-status {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.chat-search-send-btn {
+  font-size: 12px;
+  padding: 4px 14px;
+}

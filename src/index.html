@@ -128,6 +128,7 @@
       import chatRequestsView from "/js/views/chatRequests.view.js";
       import chatDetailView from "/js/views/chatDetail.view.js";
       import groupChatDetailsView from "/js/views/groupChatDetails.view.js";
+      import chatSearchView from "/js/views/chatSearch.view.js";
       import feedsView from "/js/views/feeds.view.js";
       import profileView from "/js/views/profile.view.js";
       import profileFollowersView from "/js/views/profileFollowers.view.js";
@@ -353,6 +354,9 @@
         });
         router.addRoute("/messages", () => chatView, {
           layoutOptions: { activeNavItem: "chat" },
+        });
+        router.addRoute("/chat-search", () => chatSearchView, {
+          layoutOptions: { activeNavItem: "chat-search" },
         });
         router.addRoute("/feeds", () => feedsView, {
           layoutOptions: { activeNavItem: "feeds" },

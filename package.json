@@ -44,6 +44,7 @@
     "@capacitor/haptics": "^7.0.0",
     "@capacitor/ios": "^7.0.0",
     "@capacitor/status-bar": "^7.0.0",
-    "lit-html": "3.3.3"
+    "lit-html": "3.3.3",
+    "minisearch": "^7.2.0"
   }
 }

@@ -9,6 +9,7 @@ import {
 import { homeIconTemplate } from "/js/templates/icons/homeIcon.template.js";
 import { userIconTemplate } from "/js/templates/icons/userIcon.template.js";
 import { searchIconTemplate } from "/js/templates/icons/searchIcon.template.js";
+import { chatSearchIconTemplate } from "/js/templates/icons/chatSearchIcon.template.js";
 import { chatIconTemplate } from "/js/templates/icons/chatIcon.template.js";
 import { settingsIconTemplate } from "/js/templates/icons/settingsIcon.template.js";
 import { notificationsIconTemplate } from "/js/templates/icons/notificationsIcon.template.js";
@@ -200,6 +201,12 @@ export function sidebarTemplate({
       icon: hashtagIconTemplate,
       label: "Feeds",
       url: "/feeds",
+    },
+    {
+      id: "chat-search",
+      icon: chatSearchIconTemplate,
+      label: "Chat Search",
+      url: "/chat-search",
     },
     {
       id: "bookmarks",
