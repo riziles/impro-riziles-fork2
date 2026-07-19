@@ -8,7 +8,12 @@ import MiniSearch from "/js/lib/minisearch.js";
 
 // ── Helpers ──
 
-/** Build a display label for a conversation (group name or member names). */
+/**
+ * Build a display label for a conversation (group name or member names).
+ * @param {Object} convo - Bluesky conversation object
+ * @param {string} currentDid
+ * @returns {string}
+ */
 function convoLabel(convo, currentDid) {
   const group = getGroupConvoDetails(convo);
   if (group?.name) return group.name;
@@ -20,7 +25,11 @@ function convoLabel(convo, currentDid) {
   );
 }
 
-/** Extract a short text preview from a message. */
+/**
+ * Extract a short text preview from a message.
+ * @param {Object} m - Bluesky message view object
+ * @returns {string}
+ */
 function msgText(m) {
   const t =
     m.$type === "chat.bsky.convo.defs#messageView"
@@ -31,7 +40,13 @@ function msgText(m) {
   return (t || "").substring(0, 300);
 }
 
-/** Resolve a sender DID to a display name, falling back to the DID. */
+/**
+ * Resolve a sender DID to a display name, falling back to the DID.
+ * @param {string} did
+ * @param {Object} [convo] - Bluesky conversation (for member lookup)
+ * @param {Object} [dataLayer] - Impro data layer (for profile cache)
+ * @returns {string}
+ */
 function senderLabel(did, convo, dataLayer) {
   const m = (convo?.members ?? []).find((x) => x.did === did);
   if (m) return getDisplayName(m) || m.handle || did;
@@ -40,17 +55,45 @@ function senderLabel(did, convo, dataLayer) {
   return did;
 }
 
-/** Strip supplementary-plane Unicode that confuses lit-html. */
+/**
+ * Strip supplementary-plane Unicode that confuses lit-html.
+ * @param {string} s
+ * @returns {string}
+ */
 function safe(s) {
   return (s || "").replace(/[\u{10000}-\u{10FFFF}]/gu, "").trim();
 }
 
 // ── View ──
 
-/** Full-page chat message search with MiniSearch indexing and inline reply. */
+/**
+ * Full-page chat message search with MiniSearch indexing and inline reply.
+ * @extends View
+ */
 class ChatSearchView extends View {
   async render({ root, layout, router, context: { dataLayer } }) {
+    /**
+     * Reactive view state.
+     * @typedef {Object} ChatSearchState
+     * @property {Signal.State<Array|null>} $convos
+     * @property {Signal.State<string>} $selectedConvoId
+     * @property {Signal.State<boolean>} $pulling
+     * @property {Signal.State<number>} $pullFetched
+     * @property {Signal.State<number|null>} $pullTotal
+     * @property {Signal.State<string>} $pullError
+     * @property {Signal.State<number>} $pullDays
+     * @property {Signal.State<string>} $query
+     * @property {Signal.State<string>} $senderFilter
+     * @property {Signal.State<string>} $timeFilter
+     * @property {Signal.State<{convoId: string, messages: Array, index: MiniSearch}|null>} $messages
+     * @property {Signal.State<string|null>} $replyOpen
+     * @property {Signal.State<string>} $replyText
+     * @property {Signal.State<boolean>} $replySending
+     * @property {Signal.State<string>} $replyStatus
+     */
+
     // State
+    /** @type {ChatSearchState} */
     const state = {
       $convos: new Signal.State(null),
       $selectedConvoId: new Signal.State(""),
@@ -74,7 +117,10 @@ class ChatSearchView extends View {
 
     // ── Data loading ──
 
-    /** Fetch the user's conversation list from the data layer. */
+    /**
+     * Fetch the user's conversation list from the data layer.
+     * @returns {Promise<void>}
+     */
     async function loadConvos() {
       await dataLayer.declarative.ensureCurrentUser();
       await dataLayer.requests.loadConvoList({ reload: true, limit: 100 });
@@ -82,7 +128,11 @@ class ChatSearchView extends View {
       state.$convos.set(list ?? []);
     }
 
-    /** Pull and index messages for the selected conversation and time range. */
+    /**
+     * Pull and index messages for the selected conversation and time range.
+     * Skips messages already in cache.
+     * @returns {Promise<void>}
+     */
     async function pullMessages() {
       const convoId = state.$selectedConvoId.get();
       if (!convoId || state.$pulling.get()) return;
@@ -195,7 +245,11 @@ class ChatSearchView extends View {
 
     // ── Send reply ──
 
-    /** Send a reply to a given message via the Bluesky chat API. */
+    /**
+     * Send a reply to a given message via the Bluesky chat API.
+     * @param {string} messageId
+     * @returns {Promise<void>}
+     */
     async function sendReply(messageId) {
       const text = state.$replyText.get().trim();
       if (!text || state.$replySending.get()) return;
@@ -220,7 +274,10 @@ class ChatSearchView extends View {
 
     // ── Search ──
 
-    /** Run search + filters on the current index and query. */
+    /**
+     * Run search + filters on the current index and query.
+     * @returns {Array<Object>} MiniSearch result objects with score, sender, text, sentAt
+     */
     function getResults() {
       const data = state.$messages.get();
       const q = state.$query.get().trim();
@@ -244,7 +301,11 @@ class ChatSearchView extends View {
 
     // ── Render ──
 
-    /** Collect unique sender DIDs/names from loaded messages. */
+    /**
+     * Collect unique sender DIDs/names from loaded messages.
+     * @param {Object} convo - Bluesky conversation
+     * @returns {Array<{did: string, label: string}>}
+     */
     function senderOptions(convo) {
       const data = state.$messages.get();
       if (!data) return [];
