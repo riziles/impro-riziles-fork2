@@ -1,7 +1,12 @@
-import { html } from "/js/lib/lit-html.js";
+import { html, unsafeHTML } from "/js/lib/lit-html.js";
 import { sanitizeUri } from "/js/utils.js";
 import { tokenizeRichText } from "/js/richTextHelpers.js";
 import { linkToHashtag, linkToProfileByDid } from "/js/navigation.js";
+import {
+  detectLatexSegments,
+  renderLatexInline,
+  renderLatexDisplay,
+} from "/js/latexHelpers.js";
 
 const KNOWN_UNSUPPORTED_FACET_TYPES = [
   "blue.poll.post.facet#option",
@@ -79,7 +84,29 @@ export function richTextTokensTemplate({
         if (tokens[index + 1]?.type === "block" && value.endsWith("\n")) {
           value = value.slice(0, -1);
         }
-        parts.push(value);
+        // Detect and render LaTeX math within text tokens
+        if (value.includes("$")) {
+          const segments = detectLatexSegments(value);
+          for (const seg of segments) {
+            if (seg.type === "text") {
+              parts.push(seg.value);
+            } else if (seg.type === "latex-inline") {
+              parts.push(
+                unsafeHTML(
+                  `<span class="latex-math latex-math-inline">${renderLatexInline(seg.value)}</span>`,
+                ),
+              );
+            } else if (seg.type === "latex-display") {
+              parts.push(
+                unsafeHTML(
+                  `<div class="latex-math latex-math-display">${renderLatexDisplay(seg.value)}</div>`,
+                ),
+              );
+            }
+          }
+        } else {
+          parts.push(value);
+        }
         break;
       }
       case "facet": {
