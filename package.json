@@ -9,6 +9,9 @@
     "bundle:capacitor": "esbuild ./clientLibs/capacitor.js --bundle --format=esm --outfile=src/js/lib/capacitor.js",
     "ios": "npm run build && cap sync && NODE_ENV=development cap run ios",
     "bundle:lit-html": "esbuild ./clientLibs/litHtml.js --bundle --format=esm --outfile=src/js/lib/lit-html.js",
+    "bundle:katex": "esbuild ./clientLibs/katex.js --bundle --format=esm --outfile=src/js/lib/katex.js",
+    "copy:katex": "mkdir -p src/css/fonts && cp node_modules/katex/dist/katex.min.css src/css/katex.min.css && cp node_modules/katex/dist/fonts/* src/css/fonts/",
+    "setup:katex": "npm run bundle:katex && npm run copy:katex",
     "format": "pretty-quick --staged",
     "test": "npm run test:unit",
     "test:unit": "node --import ./tests/unit/env.js --test-isolation=none --test-force-exit --test 'tests/unit/specs/**/*.test.js'",
@@ -44,6 +47,7 @@
     "@capacitor/haptics": "^7.0.0",
     "@capacitor/ios": "^7.0.0",
     "@capacitor/status-bar": "^7.0.0",
+    "katex": "^0.18.1",
     "lit-html": "3.3.3",
     "minisearch": "^7.2.0"
   }

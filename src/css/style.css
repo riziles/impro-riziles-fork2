@@ -10755,3 +10755,28 @@ p.setting-item-desc {
   font-size: 12px;
   padding: 4px 14px;
 }
+
+/* LaTeX math rendering */
+.latex-math-inline {
+  display: inline;
+}
+
+.latex-math-inline .katex {
+  font-size: 1.1em;
+}
+
+.latex-math-display {
+  display: block;
+  margin: 0.75em 0;
+  text-align: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.latex-math-display .katex-display {
+  margin: 0;
+}
+
+.latex-error {
+  color: var(--color-error, #e74c3c);
+}
